@@ -1,9 +1,9 @@
-import {Request, Response} from 'express';
-import {DriverInputDto} from '../../dto/driver.input-dto';
-import {HttpStatus} from '../../../core/types/http-statuses';
-import {db} from '../../../db/in-memory.db';
-import {Driver} from '../../types/driver';
-import {driversRepository} from "../../repositories/drivers.repository";
+import { Request, Response } from 'express';
+import { DriverInputDto } from '../../dto/driver.input-dto';
+import { HttpStatus } from '../../../core/types/http-statuses';
+import { db } from '../../../db/in-memory.db';
+import { Driver } from '../../types/driver';
+import { driversRepository } from '../../repositories/drivers.repository';
 
 export function createDriverHandler(
   req: Request<{}, {}, DriverInputDto>,

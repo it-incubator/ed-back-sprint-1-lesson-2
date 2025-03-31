@@ -1,8 +1,8 @@
-import {Request, Response} from 'express';
-import {DriverInputDto} from '../../dto/driver.input-dto';
-import {HttpStatus} from '../../../core/types/http-statuses';
-import {createErrorMessages} from '../../../core/utils/error.utils';
-import {driversRepository} from "../../repositories/drivers.repository";
+import { Request, Response } from 'express';
+import { DriverInputDto } from '../../dto/driver.input-dto';
+import { HttpStatus } from '../../../core/types/http-statuses';
+import { createErrorMessages } from '../../../core/utils/error.utils';
+import { driversRepository } from '../../repositories/drivers.repository';
 
 export function updateDriverHandler(
   req: Request<{ id: string }, {}, DriverInputDto>,
@@ -13,8 +13,10 @@ export function updateDriverHandler(
 
   if (!driver) {
     res
-        .status(HttpStatus.NotFound)
-        .send(createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]));
+      .status(HttpStatus.NotFound)
+      .send(
+        createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]),
+      );
     return;
   }
 

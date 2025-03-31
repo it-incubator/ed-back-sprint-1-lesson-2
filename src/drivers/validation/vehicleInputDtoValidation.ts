@@ -4,7 +4,9 @@ import { ValidationError } from '../types/validationError';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const vehicleInputDtoValidation = (data: DriverInputDto): ValidationError[] => {
+export const vehicleInputDtoValidation = (
+  data: DriverInputDto,
+): ValidationError[] => {
   const errors: ValidationError[] = [];
 
   if (
@@ -88,7 +90,10 @@ export const vehicleInputDtoValidation = (data: DriverInputDto): ValidationError
     });
   } else if (data.vehicleFeatures.length) {
     const existingFeatures = Object.values(VehicleFeature);
-    if (data.vehicleFeatures.length > existingFeatures.length || data.vehicleFeatures.length < 1) {
+    if (
+      data.vehicleFeatures.length > existingFeatures.length ||
+      data.vehicleFeatures.length < 1
+    ) {
       errors.push({
         field: 'vehicleFeatures',
         message: 'Invalid vehicleFeatures',
