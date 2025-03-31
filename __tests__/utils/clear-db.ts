@@ -1,3 +1,4 @@
+// @ts-ignore
 import request from 'supertest';
 import { Express } from 'express';
 import { TESTING_PATH } from '../../src/core/paths/paths';
