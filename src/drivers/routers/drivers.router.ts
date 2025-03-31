@@ -11,7 +11,7 @@ import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.gu
 
 export const driversRouter = Router({});
 
-driversRouter.use(superAdminGuardMiddleware);
+// driversRouter.use(superAdminGuardMiddleware);
 
 driversRouter
   .get('', getDriverListHandler)
@@ -20,6 +20,7 @@ driversRouter
 
   .post(
     '',
+    superAdminGuardMiddleware,
     driverInputDtoValidation,
     inputValidationResultMiddleware,
     createDriverHandler,
@@ -28,6 +29,7 @@ driversRouter
   .put(
     '/:id',
     idValidation,
+    superAdminGuardMiddleware,
     driverInputDtoValidation,
     inputValidationResultMiddleware,
     updateDriverHandler,
@@ -35,6 +37,7 @@ driversRouter
 
   .delete(
     '/:id',
+    superAdminGuardMiddleware,
     idValidation,
     inputValidationResultMiddleware,
     deleteDriverHandler,

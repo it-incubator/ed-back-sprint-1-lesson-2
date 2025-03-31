@@ -20,16 +20,16 @@ export const superAdminGuardMiddleware = (
     return;
   }
 
-  const [authType, token] = auth.split(' '); //admin:qwerty
+  const [authType, token] = auth.split(' ');
 
   if (authType !== 'Basic') {
     res.sendStatus(HttpStatus.Unauthorized);
     return;
   }
 
-  const credentials = Buffer.from(token, 'base64').toString('utf-8');
+  const credentials = Buffer.from(token, 'base64').toString('utf-8'); //dbcadkcnasdk
 
-  const [username, password] = credentials.split(':');
+  const [username, password] = credentials.split(':'); //admin:qwerty
 
   if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
     res.sendStatus(HttpStatus.Unauthorized);
