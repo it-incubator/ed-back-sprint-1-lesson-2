@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { db } from '../../../db/in-memory.db';
+import {driversRepository} from "../../repositories/drivers.repository";
 
 export function getDriverListHandler(req: Request, res: Response) {
-  res.send(db.drivers);
+  const drivers = driversRepository.findAll();
+  res.send(drivers);
 }

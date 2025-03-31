@@ -5,6 +5,7 @@ import { createErrorMessages } from '../../../core/utils/error.utils';
 import { db } from '../../../db/in-memory.db';
 import { vehicleInputDtoValidation } from '../../validation/vehicleInputDtoValidation';
 import { Driver } from '../../types/driver';
+import {driversRepository} from "../../repositories/drivers.repository";
 
 export function createDriverHandler(
   req: Request<{}, {}, DriverInputDto>,
@@ -31,6 +32,6 @@ export function createDriverHandler(
     createdAt: new Date(),
   };
 
-  db.drivers.push(newDriver);
+  driversRepository.create(newDriver);
   res.status(HttpStatus.Created).send(newDriver);
 }

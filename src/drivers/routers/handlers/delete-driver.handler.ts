@@ -1,21 +1,19 @@
-import { Request, Response } from 'express';
-import { db } from '../../../db/in-memory.db';
-import { HttpStatus } from '../../../core/types/http-statuses';
-import { createErrorMessages } from '../../../core/utils/error.utils';
+import {Request, Response} from 'express';
+import {HttpStatus} from '../../../core/types/http-statuses';
+import {createErrorMessages} from '../../../core/utils/error.utils';
+import {driversRepository} from "../../repositories/drivers.repository";
 
 export function deleteDriverHandler(req: Request, res: Response) {
   const id = parseInt(req.params.id);
-  const index = db.drivers.findIndex((v) => v.id === id);
+  const driver = driversRepository.findById(id);
 
-  if (index === -1) {
+  if (!driver) {
     res
-      .status(HttpStatus.NotFound)
-      .send(
-        createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]),
-      );
+        .status(HttpStatus.NotFound)
+        .send(createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]));
     return;
   }
 
-  db.drivers.splice(index, 1);
+  driversRepository.delete(id);
   res.sendStatus(HttpStatus.NoContent);
 }
