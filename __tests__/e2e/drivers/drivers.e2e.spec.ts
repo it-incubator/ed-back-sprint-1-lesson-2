@@ -40,7 +40,7 @@ describe('Driver API', () => {
       vehicleFeatures: [],
     };
 
-    const createdDriverResponse = await request(app)
+    await request(app)
       .post('/api/drivers')
       .send(newDriver)
       .expect(HttpStatus.Created);
