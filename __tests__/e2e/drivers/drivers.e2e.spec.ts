@@ -1,12 +1,18 @@
+// @ts-ignore
 import request from 'supertest';
+// @ts-ignore
 import express from 'express';
-import { setupApp } from '../../../src/setup-app';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
-import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { VehicleFeature } from '../../../src/drivers/types/driver';
+import { setupApp } from '../../../src/setup-app';
+import { HttpStatus } from '../../../src/core/types/http-statuses';
+import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
 import { DRIVERS_PATH } from '../../../src/core/paths/paths';
+import { getDriverDto } from '../../utils/drivers/get-driver-dto';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
+import { createDriver } from '../../utils/drivers/create-driver';
 import { clearDb } from '../../utils/clear-db';
+import { getDriverById } from '../../utils/drivers/get-driver-by-id';
+import { updateDriver } from '../../utils/drivers/update-driver';
 
 describe('Driver API', () => {
   const app = express();
@@ -14,84 +20,47 @@ describe('Driver API', () => {
 
   const adminToken = generateBasicAuthToken();
 
-  const testDriverData: DriverInputDto = {
-    name: 'Valentin',
-    phoneNumber: '123-456-7890',
-    email: 'valentin@example.com',
-    vehicleMake: 'BMW',
-    vehicleModel: 'X5',
-    vehicleYear: 2021,
-    vehicleLicensePlate: 'ABC-123',
-    vehicleDescription: null,
-    vehicleFeatures: [],
-  };
-
   beforeAll(async () => {
     await clearDb(app);
   });
 
   it('✅ should create driver; POST /api/drivers', async () => {
     const newDriver: DriverInputDto = {
-      ...testDriverData,
+      ...getDriverDto(),
       name: 'Feodor',
-      phoneNumber: '987-654-3210',
       email: 'feodor@example.com',
     };
 
-    await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send(newDriver)
-      .expect(HttpStatus.Created);
+    await createDriver(app, newDriver);
   });
 
   it('✅ should return drivers list; GET /api/drivers', async () => {
-    await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send({ ...testDriverData, name: 'Another Driver' })
-      .expect(HttpStatus.Created);
+    await createDriver(app);
+    await createDriver(app);
 
-    await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send({ ...testDriverData, name: 'Another Driver2' })
-      .expect(HttpStatus.Created);
-
-    const driverListResponse = await request(app)
+    const response = await request(app)
       .get(DRIVERS_PATH)
       .set('Authorization', adminToken)
       .expect(HttpStatus.Ok);
 
-    expect(driverListResponse.body).toBeInstanceOf(Array);
-    expect(driverListResponse.body.length).toBeGreaterThanOrEqual(2);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBeGreaterThanOrEqual(2);
   });
 
   it('✅ should return driver by id; GET /api/drivers/:id', async () => {
-    const createResponse = await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send({ ...testDriverData, name: 'Another Driver' })
-      .expect(HttpStatus.Created);
+    const createdDriver = await createDriver(app);
 
-    const getResponse = await request(app)
-      .get(`${DRIVERS_PATH}/${createResponse.body.id}`)
-      .set('Authorization', adminToken)
-      .expect(HttpStatus.Ok);
+    const driver = await getDriverById(app, createdDriver.id);
 
-    expect(getResponse.body).toEqual({
-      ...createResponse.body,
+    expect(driver).toEqual({
+      ...createdDriver,
       id: expect.any(Number),
       createdAt: expect.any(String),
     });
   });
 
   it('✅ should update driver; PUT /api/drivers/:id', async () => {
-    const createResponse = await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send({ ...testDriverData, name: 'Another Driver' })
-      .expect(HttpStatus.Created);
+    const createdDriver = await createDriver(app);
 
     const driverUpdateData: DriverInputDto = {
       name: 'Updated Name',
@@ -105,40 +74,28 @@ describe('Driver API', () => {
       vehicleFeatures: [VehicleFeature.ChildSeat],
     };
 
-    await request(app)
-      .put(`${DRIVERS_PATH}/${createResponse.body.id}`)
-      .set('Authorization', adminToken)
-      .send(driverUpdateData)
-      .expect(HttpStatus.NoContent);
+    await updateDriver(app, createdDriver.id, driverUpdateData);
 
-    const driverResponse = await request(app)
-      .get(`${DRIVERS_PATH}/${createResponse.body.id}`)
-      .set('Authorization', adminToken);
+    const driverResponse = await getDriverById(app, createdDriver.id);
 
-    expect(driverResponse.body).toEqual({
+    expect(driverResponse).toEqual({
       ...driverUpdateData,
-      id: createResponse.body.id,
+      id: createdDriver.id,
       createdAt: expect.any(String),
     });
   });
 
-  it('✅ DELETE /api/drivers/:id and check after NOT FOUND', async () => {
-    const {
-      body: { id: createdDriverId },
-    } = await request(app)
-      .post(DRIVERS_PATH)
-      .set('Authorization', adminToken)
-      .send({ ...testDriverData, name: 'Another Driver' })
-      .expect(HttpStatus.Created);
+  it('✅ should delete driver and check after "NOT FOUND"; DELETE /api/drivers/:id', async () => {
+    const createdDriver = await createDriver(app);
 
     await request(app)
-      .delete(`${DRIVERS_PATH}/${createdDriverId}`)
+      .delete(`${DRIVERS_PATH}/${createdDriver.id}`)
       .set('Authorization', adminToken)
       .expect(HttpStatus.NoContent);
 
-    const driverResponse = await request(app)
-      .get(`${DRIVERS_PATH}/${createdDriverId}`)
-      .set('Authorization', adminToken);
-    expect(driverResponse.status).toBe(HttpStatus.NotFound);
+    await request(app)
+      .get(`${DRIVERS_PATH}/${createdDriver.id}`)
+      .set('Authorization', adminToken)
+      .expect(HttpStatus.NotFound);
   });
 });
