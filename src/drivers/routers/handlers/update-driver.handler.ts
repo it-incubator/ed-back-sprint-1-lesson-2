@@ -2,7 +2,6 @@ import {Request, Response} from 'express';
 import {DriverInputDto} from '../../dto/driver.input-dto';
 import {HttpStatus} from '../../../core/types/http-statuses';
 import {createErrorMessages} from '../../../core/utils/error.utils';
-import {vehicleInputDtoValidation} from '../../validation/vehicleInputDtoValidation';
 import {driversRepository} from "../../repositories/drivers.repository";
 
 export function updateDriverHandler(
@@ -10,13 +9,8 @@ export function updateDriverHandler(
   res: Response,
 ) {
   const id = parseInt(req.params.id);
-  const errors = vehicleInputDtoValidation(req.body);
-  if (errors.length > 0) {
-    res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
-    return;
-  }
-
   const driver = driversRepository.findById(id);
+
   if (!driver) {
     res
         .status(HttpStatus.NotFound)

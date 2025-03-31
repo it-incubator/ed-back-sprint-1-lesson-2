@@ -4,16 +4,25 @@ import { getDriverHandler } from './handlers/get-driver.handler';
 import { createDriverHandler } from './handlers/create-driver.handler';
 import { updateDriverHandler } from './handlers/update-driver.handler';
 import { deleteDriverHandler } from './handlers/delete-driver.handler';
+import {idValidation} from "../../core/middlewares/validation/params-id.validation-middleware";
+import {inputValidationResultMiddleware} from "../../core/middlewares/validation/input-validtion-result.middleware";
+import {driverInputDtoValidation} from "../validation/driver.input-dto.validation-middlewares";
 
 export const driversRouter = Router({});
 
 driversRouter
-  .get('', getDriverListHandler)
+    .get('', getDriverListHandler)
 
-  .get('/:id', getDriverHandler)
+    .get('/:id', idValidation, inputValidationResultMiddleware, getDriverHandler)
 
-  .post('', createDriverHandler)
+    .post('', driverInputDtoValidation, inputValidationResultMiddleware, createDriverHandler)
 
-  .put('/:id', updateDriverHandler)
+    .put(
+        '/:id',
+        idValidation,
+        driverInputDtoValidation,
+        inputValidationResultMiddleware,
+        updateDriverHandler,
+    )
 
-  .delete('/:id', deleteDriverHandler);
+    .delete('/:id', idValidation, inputValidationResultMiddleware, deleteDriverHandler);
