@@ -1,7 +1,7 @@
-import {Request, Response} from 'express';
-import {HttpStatus} from '../../../core/types/http-statuses';
-import {createErrorMessages} from '../../../core/utils/error.utils';
-import {driversRepository} from "../../repositories/drivers.repository";
+import { Request, Response } from 'express';
+import { HttpStatus } from '../../../core/types/http-statuses';
+import { createErrorMessages } from '../../../core/utils/error.utils';
+import { driversRepository } from '../../repositories/drivers.repository';
 
 export function deleteDriverHandler(req: Request, res: Response) {
   const id = parseInt(req.params.id);
@@ -9,8 +9,10 @@ export function deleteDriverHandler(req: Request, res: Response) {
 
   if (!driver) {
     res
-        .status(HttpStatus.NotFound)
-        .send(createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]));
+      .status(HttpStatus.NotFound)
+      .send(
+        createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]),
+      );
     return;
   }
 

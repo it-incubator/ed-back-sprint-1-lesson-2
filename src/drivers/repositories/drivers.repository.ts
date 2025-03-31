@@ -2,7 +2,6 @@ import { Driver } from '../types/driver';
 import { db } from '../../db/in-memory.db';
 import { DriverInputDto } from '../dto/driver.input-dto';
 
-
 export const driversRepository = {
   findAll(): Driver[] {
     return db.drivers;
