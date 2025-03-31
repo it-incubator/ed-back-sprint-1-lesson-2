@@ -1,6 +1,4 @@
-// @ts-ignore
 import request from 'supertest';
-// @ts-ignore
 import express from 'express';
 import { VehicleFeature } from '../../../src/drivers/types/driver';
 import { setupApp } from '../../../src/setup-app';
