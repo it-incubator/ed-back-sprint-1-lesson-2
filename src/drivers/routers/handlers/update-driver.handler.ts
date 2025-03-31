@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
-import { DriverInputDto } from '../../dto/driver.input-dto';
-import { db } from '../../../db/in-memory.db';
-import { HttpStatus } from '../../../core/types/http-statuses';
-import { createErrorMessages } from '../../../core/utils/error.utils';
-import { vehicleInputDtoValidation } from '../../validation/vehicleInputDtoValidation';
+import {Request, Response} from 'express';
+import {DriverInputDto} from '../../dto/driver.input-dto';
+import {HttpStatus} from '../../../core/types/http-statuses';
+import {createErrorMessages} from '../../../core/utils/error.utils';
+import {vehicleInputDtoValidation} from '../../validation/vehicleInputDtoValidation';
 import {driversRepository} from "../../repositories/drivers.repository";
 
 export function updateDriverHandler(
