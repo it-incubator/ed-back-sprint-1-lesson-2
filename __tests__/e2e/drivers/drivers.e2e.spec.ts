@@ -1,9 +1,9 @@
 import request from 'supertest';
 import express from 'express';
-import { VehicleFeature } from '../../../src/drivers/types/driver';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
+import { DRIVERS_PATH } from '../../../src/core/paths/paths';
 
 describe('Driver API', () => {
   const app = express();
@@ -29,36 +29,31 @@ describe('Driver API', () => {
 
   it('✅ should create driver; POST /api/drivers', async () => {
     const newDriver: DriverInputDto = {
+      ...testDriverData,
       name: 'Feodor',
       phoneNumber: '987-654-3210',
       email: 'feodor@example.com',
-      vehicleMake: 'Audi',
-      vehicleModel: 'A6',
-      vehicleYear: 2020,
-      vehicleLicensePlate: 'XYZ-456',
-      vehicleDescription: null,
-      vehicleFeatures: [],
     };
 
     await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send(newDriver)
       .expect(HttpStatus.Created);
   });
 
   it('✅ should return drivers list; GET /api/drivers', async () => {
     await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send({ ...testDriverData, name: 'Another Driver' })
       .expect(HttpStatus.Created);
 
     await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send({ ...testDriverData, name: 'Another Driver2' })
       .expect(HttpStatus.Created);
 
     const driverListResponse = await request(app)
-      .get('/api/drivers')
+      .get(DRIVERS_PATH)
       .expect(HttpStatus.Ok);
 
     expect(driverListResponse.body).toBeInstanceOf(Array);
@@ -67,12 +62,12 @@ describe('Driver API', () => {
 
   it('✅ should return driver by id; GET /api/drivers/:id', async () => {
     const createResponse = await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send({ ...testDriverData, name: 'Another Driver' })
       .expect(HttpStatus.Created);
 
     const getResponse = await request(app)
-      .get(`/api/drivers/${createResponse.body.id}`)
+      .get(`${DRIVERS_PATH}/${createResponse.body.id}`)
       .expect(HttpStatus.Ok);
 
     expect(getResponse.body).toEqual({
@@ -84,29 +79,25 @@ describe('Driver API', () => {
 
   it('✅ should update driver; PUT /api/drivers/:id', async () => {
     const createResponse = await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send({ ...testDriverData, name: 'Another Driver' })
       .expect(HttpStatus.Created);
 
     const driverUpdateData: DriverInputDto = {
+      ...testDriverData,
       name: 'Updated Name',
       phoneNumber: '999-888-7777',
       email: 'updated@example.com',
       vehicleMake: 'Tesla',
-      vehicleModel: 'Model S',
-      vehicleYear: 2022,
-      vehicleLicensePlate: 'NEW-789',
-      vehicleDescription: 'Updated vehicle description',
-      vehicleFeatures: [VehicleFeature.ChildSeat],
     };
 
     await request(app)
-      .put(`/api/drivers/${createResponse.body.id}`)
+      .put(`${DRIVERS_PATH}/${createResponse.body.id}`)
       .send(driverUpdateData)
       .expect(HttpStatus.NoContent);
 
     const driverResponse = await request(app).get(
-      `/api/drivers/${createResponse.body.id}`,
+      `${DRIVERS_PATH}/${createResponse.body.id}`,
     );
 
     expect(driverResponse.body).toEqual({
@@ -118,16 +109,16 @@ describe('Driver API', () => {
 
   it(`✅ DELETE /api/drivers/:id and check after NOT FOUND`, async () => {
     const res = await request(app)
-      .post('/api/drivers')
+      .post(DRIVERS_PATH)
       .send({ ...testDriverData, name: 'Another Driver' })
       .expect(HttpStatus.Created);
 
     await request(app)
-      .delete(`/api/drivers/${res.body.id}`)
+      .delete(`${DRIVERS_PATH}/${res.body.id}`)
       .expect(HttpStatus.NoContent);
 
     const driverResponse = await request(app).get(
-      `/api/drivers/${res.body.id}`,
+      `${DRIVERS_PATH}/${res.body.id}`,
     );
     expect(driverResponse.status).toBe(HttpStatus.NotFound);
   });
