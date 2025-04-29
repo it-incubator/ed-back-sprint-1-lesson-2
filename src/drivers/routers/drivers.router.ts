@@ -6,8 +6,11 @@ import { updateDriverHandler } from './handlers/update-driver.handler';
 import { deleteDriverHandler } from './handlers/delete-driver.handler';
 import { idValidation } from '../../core/middlewares/validation/params-id.validation-middleware';
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validtion-result.middleware';
-import { driverInputDtoValidation } from '../validation/driver.input-dto.validation-middlewares';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard-middleware';
+import {
+  driverCreateInputValidation,
+  driverUpdateInputValidation,
+} from '../validation/driver.input-dto.validation-middlewares';
 
 export const driversRouter = Router({});
 
@@ -20,7 +23,7 @@ driversRouter
 
   .post(
     '',
-    driverInputDtoValidation,
+    driverCreateInputValidation,
     inputValidationResultMiddleware,
     createDriverHandler,
   )
@@ -28,7 +31,7 @@ driversRouter
   .put(
     '/:id',
     idValidation,
-    driverInputDtoValidation,
+    driverUpdateInputValidation,
     inputValidationResultMiddleware,
     updateDriverHandler,
   )

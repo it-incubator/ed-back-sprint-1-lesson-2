@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { DriverInputDto } from '../../dto/driver.input-dto';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 import { driversRepository } from '../../repositories/drivers.repository';
+import { DriverUpdateInput } from '../../dto/driver-update.input';
 
 export function updateDriverHandler(
-  req: Request<{ id: string }, {}, DriverInputDto>,
+  req: Request<{ id: string }, {}, DriverUpdateInput>,
   res: Response,
 ) {
   const id = parseInt(req.params.id);
@@ -20,6 +20,6 @@ export function updateDriverHandler(
     return;
   }
 
-  driversRepository.update(id, req.body);
+  driversRepository.update(id, req.body.data.attributes);
   res.sendStatus(HttpStatus.NoContent);
 }

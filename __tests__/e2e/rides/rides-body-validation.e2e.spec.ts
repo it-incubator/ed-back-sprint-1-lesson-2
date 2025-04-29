@@ -8,6 +8,7 @@ import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { clearDb } from '../../utils/clear-db';
 import { RIDES_PATH } from '../../../src/core/paths/paths';
 import { Currency } from '../../../src/rides/types/ride';
+import { ResourceType } from '../../../src/core/types/resource-type';
 
 describe('Rides API body validation check', () => {
   const app = express();
@@ -29,12 +30,17 @@ describe('Rides API body validation check', () => {
       .post(RIDES_PATH)
       .set('Authorization', generateBasicAuthToken())
       .send({
-        clientName: '   ', // empty string
-        price: 'bla bla', // not a number
-        currency: 1, // not a string
-        fromAddress: '', // empty string
-        toAddress: true, // not a string
-        driverId: 'bam', //not a number
+        data: {
+          type: ResourceType.Rides,
+          attributes: {
+            clientName: '   ', // empty string
+            price: 'bla bla', // not a number
+            currency: 1, // not a string
+            fromAddress: '', // empty string
+            toAddress: true, // not a string
+            driverId: 'bam', //not a number
+          },
+        },
       })
       .expect(HttpStatus.BadRequest);
 
@@ -44,12 +50,17 @@ describe('Rides API body validation check', () => {
       .post(RIDES_PATH)
       .set('Authorization', generateBasicAuthToken())
       .send({
-        clientName: 'LA', // short string
-        price: 0, // can not be 0
-        currency: 'byn', // not in Currency
-        fromAddress: 'street', // short string
-        driverId: 0, //can not be 0
-        toAddress: 'test address',
+        data: {
+          type: ResourceType.Rides,
+          attributes: {
+            clientName: 'LA', // short string
+            price: 0, // can not be 0
+            currency: 'byn', // not in Currency
+            fromAddress: 'street', // short string
+            driverId: 0, //can not be 0
+            toAddress: 'test address',
+          },
+        },
       })
       .expect(HttpStatus.BadRequest);
 
@@ -59,12 +70,17 @@ describe('Rides API body validation check', () => {
       .post(RIDES_PATH)
       .set('Authorization', generateBasicAuthToken())
       .send({
-        driverId: 5000, //driver should exist
-        clientName: 'Sam',
-        price: 100,
-        currency: Currency.USD,
-        fromAddress: 'test address',
-        toAddress: 'test address',
+        data: {
+          type: ResourceType.Rides,
+          attributes: {
+            driverId: 5000, //driver should exist
+            clientName: 'Sam',
+            price: 100,
+            currency: Currency.USD,
+            fromAddress: 'test address',
+            toAddress: 'test address',
+          },
+        },
       })
       .expect(HttpStatus.BadRequest);
 
@@ -75,6 +91,6 @@ describe('Rides API body validation check', () => {
       .get(RIDES_PATH)
       .set('Authorization', adminToken);
 
-    expect(riderListResponse.body).toHaveLength(0);
+    expect(riderListResponse.body.data).toHaveLength(0);
   });
 });

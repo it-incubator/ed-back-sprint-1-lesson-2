@@ -1,6 +1,6 @@
 import { Driver } from '../types/driver';
 import { db } from '../../db/in-memory.db';
-import { DriverInputDto } from '../dto/driver.input-dto';
+import { DriverAttributes } from '../dto/driver-attributes';
 
 export const driversRepository = {
   findAll(): Driver[] {
@@ -17,7 +17,7 @@ export const driversRepository = {
     return newDriver;
   },
 
-  update(id: number, dto: DriverInputDto): void {
+  update(id: number, dto: DriverAttributes): void {
     const driver = db.drivers.find((d) => d.id === id);
 
     if (!driver) {

@@ -1,40 +1,40 @@
 import { body } from 'express-validator';
 import { Currency } from '../types/ride';
 
-export const clientNameValidation = body('clientName')
+export const clientNameValidation = body('data.attributes.clientName')
   .isString()
   .withMessage('status should be string')
   .trim()
   .isLength({ min: 3, max: 100 });
 
-export const driverIdValidation = body('driverId')
+export const driverIdValidation = body('data.attributes.driverId')
   .isInt({ gt: 0 })
   .withMessage('ID must be a number');
 
-export const priceValidation = body('price')
+export const priceValidation = body('data.attributes.price')
   .isFloat({ gt: 0 }) // Проверка, что цена - это число больше 0
   .withMessage('price must be a positive number');
 
-export const currencyValidation = body('currency')
+export const currencyValidation = body('data.attributes.currency')
   .isString()
   .withMessage('currency should be string')
   .trim()
   .isIn(Object.values(Currency)) // Проверка на допустимые значения
   .withMessage('currency must be either "usd" or "eu"');
 
-export const startAddressValidation = body('fromAddress')
+export const startAddressValidation = body('data.attributes.fromAddress')
   .isString()
   .withMessage('startAddress should be string')
   .trim()
   .isLength({ min: 10, max: 200 });
 
-export const endAddressValidation = body('toAddress')
+export const endAddressValidation = body('data.attributes.toAddress')
   .isString()
   .withMessage('endAddress should be string')
   .trim()
   .isLength({ min: 10, max: 200 });
 
-export const rideInputDtoValidation = [
+export const rideCreateInputValidation = [
   clientNameValidation,
   driverIdValidation,
   priceValidation,

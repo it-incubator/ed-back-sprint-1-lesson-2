@@ -1,6 +1,6 @@
 import { Currency } from '../types/ride';
 
-export type RideInputDto = {
+export type RideAttributes = {
   clientName: string;
   price: number;
   currency: Currency;

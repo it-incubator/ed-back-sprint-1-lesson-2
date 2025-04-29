@@ -30,8 +30,8 @@ describe('Rides API', () => {
       .set('Authorization', adminToken)
       .expect(HttpStatus.Ok);
 
-    expect(rideListResponse.body).toBeInstanceOf(Array);
-    expect(rideListResponse.body).toHaveLength(2);
+    expect(rideListResponse.body.data).toBeInstanceOf(Array);
+    expect(rideListResponse.body.data).toHaveLength(2);
   });
 
   it('✅ should return ride by id; GET /api/rides/:id', async () => {
@@ -39,10 +39,6 @@ describe('Rides API', () => {
 
     const getRide = await getRideById(app, createdRide.id);
 
-    expect(getRide).toEqual({
-      ...createdRide,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-    });
+    expect(getRide).toEqual(createdRide);
   });
 });

@@ -5,64 +5,74 @@ import express from 'express';
 import { VehicleFeature } from '../../../src/drivers/types/driver';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
 import { DRIVERS_PATH } from '../../../src/core/paths/paths';
-import { getDriverDto } from '../../utils/drivers/get-driver-dto';
 import { generateBasicAuthToken } from '../../utils/generate-admin-auth-token';
 import { createDriver } from '../../utils/drivers/create-driver';
-import { clearDb } from '../../utils/clear-db';
 import { getDriverById } from '../../utils/drivers/get-driver-by-id';
 import { updateDriver } from '../../utils/drivers/update-driver';
+import { ResourceType } from '../../../src/core/types/resource-type';
+import { DriverInput } from '../../../src/drivers/dto/driver.input';
+import { DriverAttributes } from '../../../src/drivers/dto/driver-attributes';
 
 describe('Driver API', () => {
   const app = express();
   setupApp(app);
 
+  const testDriverData: DriverInput = {
+    data: {
+      type: ResourceType.Drivers,
+      attributes: {
+        name: 'Valentin',
+        phoneNumber: '123-456-7890',
+        email: 'valentin@example.com',
+        vehicleMake: 'BMW',
+        vehicleModel: 'X5',
+        vehicleYear: 2021,
+        vehicleLicensePlate: 'ABC-123',
+        vehicleDescription: null,
+        vehicleFeatures: [],
+      },
+    },
+  };
   const adminToken = generateBasicAuthToken();
 
   beforeAll(async () => {
-    await clearDb(app);
+    await request(app)
+      .delete('/api/testing/all-data')
+      .expect(HttpStatus.NoContent);
   });
 
   it('✅ should create driver; POST /api/drivers', async () => {
-    const newDriver: DriverInputDto = {
-      ...getDriverDto(),
-      name: 'Feodor',
-      email: 'feodor@example.com',
-    };
-
-    await createDriver(app, newDriver);
+    await createDriver(app, {
+      ...testDriverData.data.attributes,
+      name: 'Fedor',
+    });
   });
 
   it('✅ should return drivers list; GET /api/drivers', async () => {
     await createDriver(app);
     await createDriver(app);
 
-    const response = await request(app)
+    const driverListResponse = await request(app)
       .get(DRIVERS_PATH)
       .set('Authorization', adminToken)
       .expect(HttpStatus.Ok);
-
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body.length).toBeGreaterThanOrEqual(2);
+    expect(driverListResponse.body.data).toBeInstanceOf(Array);
+    expect(driverListResponse.body.data.length).toBeGreaterThanOrEqual(2);
   });
 
   it('✅ should return driver by id; GET /api/drivers/:id', async () => {
-    const createdDriver = await createDriver(app);
+    const createResponse = await createDriver(app);
 
-    const driver = await getDriverById(app, createdDriver.id);
+    const driver = await getDriverById(app, createResponse.id);
 
-    expect(driver).toEqual({
-      ...createdDriver,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-    });
+    expect(driver).toEqual(createResponse);
   });
 
   it('✅ should update driver; PUT /api/drivers/:id', async () => {
-    const createdDriver = await createDriver(app);
+    const createResponse = await createDriver(app);
 
-    const driverUpdateData: DriverInputDto = {
+    const driverUpdateData: DriverAttributes = {
       name: 'Updated Name',
       phoneNumber: '999-888-7777',
       email: 'updated@example.com',
@@ -74,14 +84,12 @@ describe('Driver API', () => {
       vehicleFeatures: [VehicleFeature.ChildSeat],
     };
 
-    await updateDriver(app, createdDriver.id, driverUpdateData);
+    await updateDriver(app, createResponse.id, driverUpdateData);
 
-    const driverResponse = await getDriverById(app, createdDriver.id);
-
+    const driverResponse = await getDriverById(app, createResponse.id);
     expect(driverResponse).toEqual({
-      ...driverUpdateData,
-      id: createdDriver.id,
-      createdAt: expect.any(String),
+      ...createResponse,
+      attributes: { ...createResponse.attributes, ...driverUpdateData },
     });
   });
 

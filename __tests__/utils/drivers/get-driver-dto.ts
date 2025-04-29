@@ -1,6 +1,6 @@
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
+import { DriverAttributes } from '../../../src/drivers/dto/driver-attributes';
 
-export function getDriverDto(): DriverInputDto {
+export function getDriverDto(): DriverAttributes {
   return {
     name: 'Feodor',
     phoneNumber: '987-654-3210',

@@ -1,19 +1,25 @@
 import request from 'supertest';
 import { Express } from 'express';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { getDriverDto } from './get-driver-dto';
 import { DRIVERS_PATH } from '../../../src/core/paths/paths';
 import { generateBasicAuthToken } from '../generate-admin-auth-token';
+import { DriverAttributes } from '../../../src/drivers/dto/driver-attributes';
+import { DriverUpdateInput } from '../../../src/drivers/dto/driver-update.input';
+import { ResourceType } from '../../../src/core/types/resource-type';
 
 export async function updateDriver(
   app: Express,
   driverId: number,
-  driverDto?: DriverInputDto,
+  driverDto?: DriverAttributes,
 ): Promise<void> {
-  const defaultDriverData: DriverInputDto = getDriverDto();
-
-  const testDriverData = { ...defaultDriverData, ...driverDto };
+  const testDriverData: DriverUpdateInput = {
+    data: {
+      type: ResourceType.Drivers,
+      id: driverId,
+      attributes: { ...getDriverDto(), ...driverDto },
+    },
+  };
 
   const updatedDriverResponse = await request(app)
     .put(`${DRIVERS_PATH}/${driverId}`)

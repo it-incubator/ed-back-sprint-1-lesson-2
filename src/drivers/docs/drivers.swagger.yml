@@ -1,13 +1,3 @@
-openapi: 3.0.0
-info:
-  title: API Documentation
-  version: 1.0.0
-
-securitySchemes:
-  BasicAuth:
-    type: http
-    scheme: basic
-
 tags:
   - name: Drivers
     description: API for managing drivers
@@ -25,9 +15,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Driver'
+                $ref: '#/components/schemas/DriverListOutput'
     post:
       summary: Add a new driver
       tags: [ Drivers ]
@@ -38,14 +26,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DriverInputDto'
+              $ref: '#/components/schemas/DriverInput'
       responses:
         201:
-          description: The driver was successfully created with status "online"
+          description: The driver was successfully created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Driver'
+                $ref: '#/components/schemas/DriverOutput'
         400:
           description: Validation error
           content:
@@ -73,7 +61,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Driver'
+                $ref: '#/components/schemas/DriverOutput'
         404:
           description: Driver not found
     put:
@@ -94,7 +82,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DriverInputDto'
+              $ref: '#/components/schemas/DriverUpdateInput'
       responses:
         204:
           description: Driver updated successfully
@@ -121,21 +109,73 @@ paths:
             example: 2
       responses:
         204:
-          description: "Driver deleted successfully"
-        400:
-          description: "Driver is currently on a job (has status 'on-ride')"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
+          description: Driver deleted successfully
         404:
-          description: "Driver not found"
+          description: Driver not found
 components:
   securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
   schemas:
+    DriverAttributes:
+      type: object
+      required:
+        - name
+        - phoneNumber
+        - email
+        - vehicleMake
+        - vehicleModel
+        - vehicleYear
+        - vehicleLicensePlate
+        - vehicleFeatures
+        - createdAt
+      properties:
+        name:
+          type: string
+          description: "The full name of the driver"
+          example: "Tom Rider"
+        phoneNumber:
+          type: string
+          description: "The driver's phone number"
+          example: "123-456-7890"
+        email:
+          type: string
+          description: "The driver's email address"
+          example: "tom.rider@example.com"
+        vehicleMake:
+          type: string
+          description: "The make of the vehicle"
+          example: "Toyota"
+        vehicleModel:
+          type: string
+          description: "The model of the vehicle"
+          example: "Camry"
+        vehicleYear:
+          type: integer
+          description: "The year the vehicle was manufactured"
+          example: 2020
+        vehicleLicensePlate:
+          type: string
+          description: "The vehicle's license plate number"
+          example: "XYZ 1234"
+        vehicleDescription:
+          type: string
+          nullable: true
+          description: "A description of the vehicle, including any notable features or conditions"
+          example: "A spacious SUV with leather seats and a sunroof."
+        vehicleFeatures:
+          type: array
+          items:
+            type: string
+            enum: [ wi-fi, child-seat, pet-friendly ]
+          description: "Features available in the vehicle. Choose from the provided options"
+          example: [ "wi-fi", "pet-friendly" ]
+        createdAt:
+          type: string
+          format: date-time
+          description: "The date and time when the driver was created"
+          example: "2023-03-05T12:00:00Z"
     Driver:
       type: object
       required:
@@ -186,7 +226,7 @@ components:
           type: string
           nullable: true
           description: "A description of the vehicle, including any notable features or conditions"
-          example: "A spacious SUV with leather seats and a sunroof"
+          example: "A spacious SUV with leather seats and a sunroof."
         vehicleFeatures:
           type: array
           items:
@@ -199,58 +239,66 @@ components:
           format: date-time
           description: "The date and time when the driver was created"
           example: "2023-03-05T12:00:00Z"
-    DriverInputDto:
+    DriverInput:
+      type: object
+      required: [ data ]
+      properties:
+        data:
+          type: object
+          required: [ type, attributes ]
+          properties:
+            type:
+              type: string
+              enum: [ Drivers ]
+            attributes:
+              $ref: '#/components/schemas/DriverAttributes'
+    DriverUpdateInput:
+      type: object
+      required: [ data ]
+      properties:
+        data:
+          type: object
+          required: [ type, id, attributes ]
+          properties:
+            type:
+              type: string
+              enum: [ Drivers ]
+            id:
+              type: string
+              example: 5f1a2b3c4d5e6f7g8h9i0j1k2
+            attributes:
+              $ref: '#/components/schemas/DriverAttributes'
+    DriverOutput:
       type: object
       required:
-        - name
-        - phoneNumber
-        - email
-        - vehicleMake
-        - vehicleModel
-        - vehicleYear
-        - vehicleLicensePlate
-        - vehicleFeatures
+        - data
       properties:
-        name:
-          type: string
-          description: "The full name of the driver"
-          example: "Tom Rider"
-        phoneNumber:
-          type: string
-          description: "The driver's phone number"
-          example: "123-456-7890"
-        email:
-          type: string
-          description: "The driver's email address"
-          example: "tom.rider@example.com"
-        vehicleMake:
-          type: string
-          description: "The make of the vehicle"
-          example: "Toyota"
-        vehicleModel:
-          type: string
-          description: "The model of the vehicle"
-          example: "Camry"
-        vehicleYear:
-          type: integer
-          description: "The year the vehicle was manufactured"
-          example: 2025
-        vehicleLicensePlate:
-          type: string
-          description: "The vehicle's license plate number"
-          example: "XYZ 1234"
-        vehicleDescription:
-          type: string
-          nullable: true
-          description: "A description of the vehicle, including any notable features or conditions"
-          example: "A spacious SUV with leather seats and a sunroof"
-        vehicleFeatures:
+        data:
+          type: object
+          required:
+            - type
+            - id
+            - attributes
+          properties:
+            type:
+              type: string
+              enum: [ drivers ]
+              example: drivers
+            id:
+              type: string
+              example: 5f1a2b3c4d5e6f7g8h9i0j1k2
+            attributes:
+              $ref: '#/components/schemas/DriverAttributes'
+    DriverListOutput:
+      type: object
+      required: [ meta, data ]
+      properties:
+        meta:
+          type: object
+        data:
           type: array
           items:
-            type: string
-            enum: [ wi-fi, child-seat, pet-friendly ]
-          description: "Features available in the vehicle. Choose from the provided options"
-          example: [ "wi-fi", "pet-friendly" ]
+            $ref: '#/components/schemas/DriverUpdateInput'
     ValidationError:
       type: object
       properties:

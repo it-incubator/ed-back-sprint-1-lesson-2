@@ -2,7 +2,7 @@
 import request from 'supertest';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import { Express } from 'express';
-import { RideInputDto } from '../../../src/rides/dto/ride-input.dto';
+import { RideCreateInput } from '../../../src/rides/dto/ride.input';
 import { createDriver } from '../drivers/create-driver';
 import { Ride } from '../../../src/rides/types/ride';
 import { generateBasicAuthToken } from '../generate-admin-auth-token';
@@ -11,13 +11,13 @@ import { getRideDto } from './get-ride-dto';
 
 export async function createRide(
   app: Express,
-  rideDto?: RideInputDto,
+  rideDto?: RideCreateInput,
 ): Promise<Ride> {
   const driver = await createDriver(app);
 
   const defaultRideData = getRideDto(driver.id);
 
-  const testRideData = { ...defaultRideData, ...rideDto };
+  const testRideData: RideCreateInput = { ...defaultRideData, ...rideDto };
 
   const createdRideResponse = await request(app)
     .post(RIDES_PATH)
