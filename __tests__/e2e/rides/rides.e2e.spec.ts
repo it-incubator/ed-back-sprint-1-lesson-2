@@ -30,19 +30,16 @@ describe('Rides API', () => {
       .set('Authorization', adminToken)
       .expect(HttpStatus.Ok);
 
-    expect(rideListResponse.body).toBeInstanceOf(Array);
-    expect(rideListResponse.body).toHaveLength(2);
+    // В JSON:API список ресурсов лежит в поле data.
+    expect(rideListResponse.body.data).toBeInstanceOf(Array);
+    expect(rideListResponse.body.data).toHaveLength(2);
   });
 
   it('✅ should return ride by id; GET /api/rides/:id', async () => {
     const createdRide = await createRide(app);
 
-    const getRide = await getRideById(app, createdRide.id);
+    const getRide = await getRideById(app, createdRide.data.id);
 
-    expect(getRide).toEqual({
-      ...createdRide,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-    });
+    expect(getRide).toEqual(createdRide);
   });
 });

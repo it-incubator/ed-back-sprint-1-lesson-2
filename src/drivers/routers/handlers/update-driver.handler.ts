@@ -1,16 +1,18 @@
 import { Request, Response } from 'express';
-import { DriverInputDto } from '../../dto/driver.input.dto';
+import { DriverUpdateInput } from '../../dto/driver.input';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
 import { driversRepository } from '../../repositories/drivers.repository';
 
 export function updateDriverHandler(
-  req: Request<{ id: string }, {}, DriverInputDto>,
+  req: Request<{ id: string }, {}, DriverUpdateInput>,
   res: Response,
 ) {
-  // Тело и id уже проверены middleware-валидаторами.
-  // Репозиторий вернёт false, если водитель с таким id не найден.
-  const isUpdated = driversRepository.update(+req.params.id, req.body);
+  // В репозиторий передаём атрибуты (доменные поля), а не весь JSON:API-конверт.
+  const isUpdated = driversRepository.update(
+    +req.params.id,
+    req.body.data.attributes,
+  );
 
   if (!isUpdated) {
     res

@@ -1,17 +1,26 @@
 import request from 'supertest';
 import { Express } from 'express';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input.dto';
+import { ResourceType } from '../../../src/core/types/resource-type';
+import { DriverAttributes } from '../../../src/drivers/dto/driver-attributes';
+import { DriverUpdateInput } from '../../../src/drivers/dto/driver.input';
 import { DRIVERS_PATH } from '../../../src/drivers/constants/drivers.paths';
 import { generateBasicAuthToken } from '../generate-admin-auth-token';
 import { getDriverDto } from './get-driver-dto';
 
 export async function updateDriver(
   app: Express,
-  driverId: number,
-  driverDto?: DriverInputDto,
+  driverId: string,
+  driverAttributes?: Partial<DriverAttributes>,
 ): Promise<void> {
-  const testDriverData: DriverInputDto = { ...getDriverDto(), ...driverDto };
+  // В обновлении JSON:API требует data.id, который должен совпадать с id в URL.
+  const testDriverData: DriverUpdateInput = {
+    data: {
+      type: ResourceType.Drivers,
+      id: driverId,
+      attributes: { ...getDriverDto(), ...driverAttributes },
+    },
+  };
 
   await request(app)
     .put(`${DRIVERS_PATH}/${driverId}`)

@@ -1,8 +1,8 @@
-import { RideInputDto } from '../../../src/rides/dto/ride.input.dto';
+import { RideAttributes } from '../../../src/rides/dto/ride-attributes';
 import { Currency } from '../../../src/rides/types/ride';
 
-// Корректные данные поездки по умолчанию для тестов (для указанного водителя).
-export function getRideDto(driverId: number): RideInputDto {
+// Корректные атрибуты поездки по умолчанию (без JSON:API-обёртки).
+export function getRideDto(driverId: number): RideAttributes {
   return {
     driverId,
     clientName: 'Bob',

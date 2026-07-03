@@ -1,27 +1,22 @@
 import { Request, Response } from 'express';
-import { DriverInputDto } from '../../dto/driver.input.dto';
+import { DriverCreateInput } from '../../dto/driver.input';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { Driver } from '../../types/driver';
 import { driversRepository } from '../../repositories/drivers.repository';
+import { mapToDriverOutput } from '../mappers/map-driver-to-output';
 
 export function createDriverHandler(
-  req: Request<{}, {}, DriverInputDto>,
+  req: Request<{}, {}, DriverCreateInput>,
   res: Response,
 ) {
-  // Тело запроса уже проверено middleware-валидаторами, поэтому здесь только создаём.
+  // Тело уже проверено middleware-валидаторами. Данные лежат в data.attributes.
+  const attributes = req.body.data.attributes;
+
   const newDriver: Omit<Driver, 'id'> = {
-    name: req.body.name,
-    phoneNumber: req.body.phoneNumber,
-    email: req.body.email,
-    vehicleMake: req.body.vehicleMake,
-    vehicleModel: req.body.vehicleModel,
-    vehicleYear: req.body.vehicleYear,
-    vehicleLicensePlate: req.body.vehicleLicensePlate,
-    vehicleDescription: req.body.vehicleDescription,
-    vehicleFeatures: req.body.vehicleFeatures,
+    ...attributes,
     createdAt: new Date(),
   };
 
   const createdDriver = driversRepository.create(newDriver);
-  res.status(HttpStatus.Created).send(createdDriver);
+  res.status(HttpStatus.Created).send(mapToDriverOutput(createdDriver));
 }

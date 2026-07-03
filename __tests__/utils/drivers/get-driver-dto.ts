@@ -1,7 +1,7 @@
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input.dto';
+import { DriverAttributes } from '../../../src/drivers/dto/driver-attributes';
 
-// Корректные данные водителя по умолчанию для тестов.
-export function getDriverDto(): DriverInputDto {
+// Корректные атрибуты водителя по умолчанию (без JSON:API-обёртки).
+export function getDriverDto(): DriverAttributes {
   return {
     name: 'Feodor',
     phoneNumber: '987-654-3210',

@@ -1,11 +1,14 @@
 import request from 'supertest';
 import { Express } from 'express';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { Ride } from '../../../src/rides/types/ride';
+import { RideOutput } from '../../../src/rides/dto/ride.output';
 import { RIDES_PATH } from '../../../src/rides/constants/rides.paths';
 import { generateBasicAuthToken } from '../generate-admin-auth-token';
 
-export async function getRideById(app: Express, rideId: number): Promise<Ride> {
+export async function getRideById(
+  app: Express,
+  rideId: string,
+): Promise<RideOutput> {
   const getResponse = await request(app)
     .get(`${RIDES_PATH}/${rideId}`)
     .set('Authorization', generateBasicAuthToken())
