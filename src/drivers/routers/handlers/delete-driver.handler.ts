@@ -3,15 +3,17 @@ import { db } from '../../../db/in-memory.db';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export function deleteDriverHandler(req: Request, res: Response) {
-  const id = parseInt(req.params.id);
-  const index = db.drivers.findIndex((v) => v.id === id);
+export function deleteDriverHandler(
+  req: Request<{ id: string }>,
+  res: Response,
+) {
+  const index = db.drivers.findIndex((d) => d.id === +req.params.id);
 
   if (index === -1) {
     res
       .status(HttpStatus.NotFound)
       .send(
-        createErrorMessages([{ field: 'id', message: 'Vehicle not found' }]),
+        createErrorMessages([{ field: 'id', message: 'Driver not found' }]),
       );
     return;
   }

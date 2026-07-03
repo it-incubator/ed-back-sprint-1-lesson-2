@@ -3,9 +3,8 @@ import { db } from '../../../db/in-memory.db';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export function getDriverHandler(req: Request, res: Response) {
-  const id = parseInt(req.params.id);
-  const driver = db.drivers.find((d) => d.id === id);
+export function getDriverHandler(req: Request<{ id: string }>, res: Response) {
+  const driver = db.drivers.find((d) => d.id === +req.params.id);
 
   if (!driver) {
     res
@@ -16,5 +15,5 @@ export function getDriverHandler(req: Request, res: Response) {
     return;
   }
 
-  res.send(driver);
+  res.status(HttpStatus.Ok).send(driver);
 }

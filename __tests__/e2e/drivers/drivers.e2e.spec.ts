@@ -2,8 +2,8 @@ import request from 'supertest';
 import express from 'express';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
-import { DRIVERS_PATH } from '../../../src/core/paths/paths';
+import { DriverInputDto } from '../../../src/drivers/dto/driver.input.dto';
+import { DRIVERS_PATH } from '../../../src/drivers/constants/drivers.paths';
 
 describe('Driver API', () => {
   const app = express();

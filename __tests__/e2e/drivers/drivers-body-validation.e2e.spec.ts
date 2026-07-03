@@ -3,8 +3,9 @@ import { VehicleFeature } from '../../../src/drivers/types/driver';
 import { setupApp } from '../../../src/setup-app';
 import { HttpStatus } from '../../../src/core/types/http-statuses';
 import express from 'express';
-import { DriverInputDto } from '../../../src/drivers/dto/driver.input-dto';
-import { DRIVERS_PATH, TESTING_PATH } from '../../../src/core/paths/paths';
+import { DriverInputDto } from '../../../src/drivers/dto/driver.input.dto';
+import { DRIVERS_PATH } from '../../../src/drivers/constants/drivers.paths';
+import { TESTING_PATH } from '../../../src/testing/constants/testing.paths';
 
 describe('Driver API body validation check', () => {
   const app = express();
@@ -66,7 +67,7 @@ describe('Driver API body validation check', () => {
     expect(invalidDataSet3.body.errorMessages).toHaveLength(1);
 
     // check что никто не создался
-    const driverListResponse = await request(app).get('DRIVERS_PATH');
+    const driverListResponse = await request(app).get(DRIVERS_PATH);
     expect(driverListResponse.body).toHaveLength(0);
   });
 
