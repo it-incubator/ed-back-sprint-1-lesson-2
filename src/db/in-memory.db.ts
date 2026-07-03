@@ -1,4 +1,5 @@
 import { Driver, VehicleFeature } from '../drivers/types/driver';
+import { Ride } from '../rides/types/ride';
 
 export const db = {
   drivers: <Driver[]>[
@@ -42,4 +43,5 @@ export const db = {
       createdAt: new Date(),
     },
   ],
+  rides: <Ride[]>[],
 };
