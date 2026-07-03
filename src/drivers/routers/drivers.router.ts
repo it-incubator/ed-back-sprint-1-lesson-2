@@ -4,18 +4,43 @@ import { getDriverHandler } from './handlers/get-driver.handler';
 import { createDriverHandler } from './handlers/create-driver.handler';
 import { updateDriverHandler } from './handlers/update-driver.handler';
 import { deleteDriverHandler } from './handlers/delete-driver.handler';
+import { idValidation } from '../../core/middlewares/validation/params-id.validation.middleware';
+import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
+import { driverInputDtoValidation } from '../validation/driver.input-dto.validation-middlewares';
 import { DRIVERS_ROUTES } from '../constants/drivers.paths';
 
 export const driversRouter = Router({});
 
+// Каждая цепочка: валидация -> проверка её результата -> handler.
 // Пути маршрутов берём из констант модуля, а не из строковых литералов.
 driversRouter
   .get(DRIVERS_ROUTES.ROOT, getDriverListHandler)
 
-  .get(DRIVERS_ROUTES.BY_ID, getDriverHandler)
+  .get(
+    DRIVERS_ROUTES.BY_ID,
+    idValidation,
+    inputValidationResultMiddleware,
+    getDriverHandler,
+  )
 
-  .post(DRIVERS_ROUTES.ROOT, createDriverHandler)
+  .post(
+    DRIVERS_ROUTES.ROOT,
+    driverInputDtoValidation,
+    inputValidationResultMiddleware,
+    createDriverHandler,
+  )
 
-  .put(DRIVERS_ROUTES.BY_ID, updateDriverHandler)
+  .put(
+    DRIVERS_ROUTES.BY_ID,
+    idValidation,
+    driverInputDtoValidation,
+    inputValidationResultMiddleware,
+    updateDriverHandler,
+  )
 
-  .delete(DRIVERS_ROUTES.BY_ID, deleteDriverHandler);
+  .delete(
+    DRIVERS_ROUTES.BY_ID,
+    idValidation,
+    inputValidationResultMiddleware,
+    deleteDriverHandler,
+  );

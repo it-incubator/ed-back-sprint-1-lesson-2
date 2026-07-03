@@ -1,21 +1,14 @@
 import { Request, Response } from 'express';
 import { DriverInputDto } from '../../dto/driver.input.dto';
 import { HttpStatus } from '../../../core/types/http-statuses';
-import { createErrorMessages } from '../../../core/utils/error.utils';
-import { validateDriverInputDto } from '../../validation/driver-input-dto.validation';
+import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
 import { driversRepository } from '../../repositories/drivers.repository';
 
 export function updateDriverHandler(
   req: Request<{ id: string }, {}, DriverInputDto>,
   res: Response,
 ) {
-  const errors = validateDriverInputDto(req.body);
-
-  if (errors.length > 0) {
-    res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
-    return;
-  }
-
+  // Тело и id уже проверены middleware-валидаторами.
   // Репозиторий вернёт false, если водитель с таким id не найден.
   const isUpdated = driversRepository.update(+req.params.id, req.body);
 
