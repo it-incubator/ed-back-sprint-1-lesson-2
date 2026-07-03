@@ -1,25 +1,14 @@
 import { Request, Response } from 'express';
 import { DriverInputDto } from '../../dto/driver.input.dto';
-import { db } from '../../../db/in-memory.db';
 import { HttpStatus } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 import { validateDriverInputDto } from '../../validation/driver-input-dto.validation';
+import { driversRepository } from '../../repositories/drivers.repository';
 
 export function updateDriverHandler(
   req: Request<{ id: string }, {}, DriverInputDto>,
   res: Response,
 ) {
-  const index = db.drivers.findIndex((d) => d.id === +req.params.id);
-
-  if (index === -1) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(
-        createErrorMessages([{ field: 'id', message: 'Driver not found' }]),
-      );
-    return;
-  }
-
   const errors = validateDriverInputDto(req.body);
 
   if (errors.length > 0) {
@@ -27,8 +16,17 @@ export function updateDriverHandler(
     return;
   }
 
-  // Обновляем поля из тела запроса, сохраняя служебные id и createdAt.
-  db.drivers[index] = { ...db.drivers[index], ...req.body };
+  // Репозиторий вернёт false, если водитель с таким id не найден.
+  const isUpdated = driversRepository.update(+req.params.id, req.body);
+
+  if (!isUpdated) {
+    res
+      .status(HttpStatus.NotFound)
+      .send(
+        createErrorMessages([{ field: 'id', message: 'Driver not found' }]),
+      );
+    return;
+  }
 
   res.sendStatus(HttpStatus.NoContent);
 }

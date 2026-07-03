@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { db } from '../../../db/in-memory.db';
 import { HttpStatus } from '../../../core/types/http-statuses';
+import { driversRepository } from '../../repositories/drivers.repository';
 
 export function getDriverListHandler(req: Request, res: Response) {
-  res.status(HttpStatus.Ok).send(db.drivers);
+  res.status(HttpStatus.Ok).send(driversRepository.findAll());
 }
